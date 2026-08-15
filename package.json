@@ -1,0 +1,27 @@
+{
+  "name": "codex-usage-watcher",
+  "version": "1.1.1",
+  "private": true,
+  "description": "Unofficial Windows watcher for Codex ChatGPT rate-limit usage, resets, and recovery events via the documented Codex app-server protocol.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/main.js",
+    "status": "node src/status.js",
+    "check": "node src/check-now.js",
+    "test": "node tests/all-tests.js",
+    "test-notification": "node src/test-notification.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "openai",
+    "codex-cli",
+    "rate-limit",
+    "usage-monitor",
+    "windows",
+    "app-server"
+  ]
+}

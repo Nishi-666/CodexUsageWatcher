@@ -1,0 +1,30 @@
+# User-local configuration (may contain email addresses / local paths)
+config.json
+.env
+.env.*
+!.env.example
+
+# Runtime state and logs
+data/*
+!data/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# Node / tooling
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local archives / temporary files
+*.zip
+*.tmp
+*.bak

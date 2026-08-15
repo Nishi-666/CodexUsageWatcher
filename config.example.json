@@ -1,0 +1,30 @@
+{
+  "codex": {
+    "command": "auto",
+    "args": ["app-server"],
+    "pollIntervalSeconds": 60,
+    "requestTimeoutSeconds": 20,
+    "restartMaxDelaySeconds": 60
+  },
+  "detection": {
+    "resetDropMinPoints": 3,
+    "normalResetGraceSeconds": 600,
+    "resetTimeChangeMinSeconds": 60,
+    "remainingWarningThresholds": [20, 10, 5, 0]
+  },
+  "notifications": {
+    "windows": {"enabled": true,"sound": true,"displaySeconds": 8},
+    "email": {"enabled": false,"smtpHost": "smtp.gmail.com","smtpPort": 587,"enableSsl": true,"username": "","passwordEnv": "CODEX_WATCHER_SMTP_PASSWORD","from": "","to": []},
+    "notifyOnStartup": false,
+    "notifyOnRecovery": true,
+    "notifyOnNormalReset": true,
+    "notifyOnResetTimeChanged": true,
+    "notifyOnCreditChange": true
+  },
+  "storage": {
+    "stateFile": "data/state.json",
+    "historyFile": "data/history.jsonl",
+    "eventLogFile": "logs/watcher.log",
+    "appServerLogFile": "logs/app-server.log"
+  }
+}
