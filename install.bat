@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-echo === Codex Usage Watcher setup v1.1.1 ===
+echo === Codex Usage Watcher setup v1.1.2 ===
 where node >nul 2>nul || (
   echo [ERROR] Node.js is not available in PATH.
   echo Node.js 22 or later is required.
