@@ -72,6 +72,30 @@ test('detect reset time change without usage reset', () => {
   assert(events.some((e) => e.type === 'RESET_TIME_CHANGED'));
 });
 
+test('suppress reset time change while usage remains at 100 percent', () => {
+  const prev = snap(1_000_000, 100, 2000);
+  const cur = snap(1_060_000, 100, 2060);
+  const events = detectEvents(prev, cur, cfg);
+  assert(!events.some((e) => e.type === 'RESET_TIME_CHANGED'));
+});
+
+test('continue suppressing moving reset time on repeated exhausted polls', () => {
+  const first = snap(1_000_000, 100, 2000);
+  const second = snap(1_060_000, 100, 2060);
+  const third = snap(1_120_000, 100, 2120);
+  assert(!detectEvents(first, second, cfg).some((e) => e.type === 'RESET_TIME_CHANGED'));
+  assert(!detectEvents(second, third, cfg).some((e) => e.type === 'RESET_TIME_CHANGED'));
+});
+
+test('still detect recovery from 100 percent as a reset', () => {
+  const reset = 2_000_000;
+  const prev = snap((reset - 60) * 1000, 100, reset);
+  const cur = snap((reset + 30) * 1000, 0, reset + 300);
+  const events = detectEvents(prev, cur, cfg);
+  assert(events.some((e) => e.type === 'NORMAL_RESET'));
+  assert(!events.some((e) => e.type === 'RESET_TIME_CHANGED'));
+});
+
 test('detect remaining threshold crossing', () => {
   const prev = snap(1_000_000, 79, 2000);
   const cur = snap(1_060_000, 81, 2000);
