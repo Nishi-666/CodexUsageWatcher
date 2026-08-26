@@ -27,6 +27,7 @@ function detectEvents(previous, current, cfg) {
     const resetTimeMovedForward = resetTimeDiff !== null && resetTimeDiff >= cfg.resetTimeChangeMinSeconds;
     const enoughDrop = usedDrop >= cfg.resetDropMinPoints;
     const smallDropWithNewWindow = usedDrop > 0 && resetTimeMovedForward;
+    const currentLimitReached = cur.usedPercent >= 100;
 
     let resetDetected = false;
     if (enoughDrop || smallDropWithNewWindow) {
@@ -54,7 +55,11 @@ function detectEvents(previous, current, cfg) {
       ));
     }
 
-    if (!resetDetected && resetTimeDiff !== null && Math.abs(resetTimeDiff) >= cfg.resetTimeChangeMinSeconds) {
+    // While the usage window is exhausted, Codex may move resetsAt as the
+    // server refreshes its limit state. Treating each movement as a real
+    // schedule change causes one notification per poll. The actual recovery
+    // is still detected above when usedPercent drops from 100%.
+    if (!resetDetected && !currentLimitReached && resetTimeDiff !== null && Math.abs(resetTimeDiff) >= cfg.resetTimeChangeMinSeconds) {
       events.push(event('RESET_TIME_CHANGED', 'NOTICE', cur, {
         previousResetsAt: prev.resetsAt,
         currentResetsAt: cur.resetsAt,

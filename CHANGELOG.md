@@ -2,6 +2,17 @@
 
 All notable public changes to Codex Usage Watcher will be documented here.
 
+## [1.1.2] - 2026-08-26
+
+### Fixed
+
+- Suppress `RESET_TIME_CHANGED` notifications while a usage window remains exhausted at 100% used. Codex can move `resetsAt` while refreshing an exhausted limit state; treating every movement as a real schedule change caused a notification on each 60-second poll.
+- Preserve normal reset detection when usage actually recovers from 100%, so a real reset still emits `NORMAL_RESET` or `EARLY_RESET`.
+
+### Tests
+
+- Added regression coverage for a single exhausted reset-time movement, repeated 60-second exhausted polls, and recovery from 100% usage.
+
 ## [1.1.1] - 2026-08-15
 
 Initial public open-source release preparation.
