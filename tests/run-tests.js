@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
 const os = require('node:os');
-const { detectEvents } = require('../src/detector');
+const { detectEvents, isEffectivelyExhausted } = require('../src/detector');
 const { normalizeRateLimits } = require('../src/normalize');
 const { resolveCodex } = require('../src/codex-resolver');
 const { readLock } = require('../src/process-lock');
@@ -75,6 +75,28 @@ test('detect reset time change without usage reset', () => {
 test('suppress reset time change while usage remains at 100 percent', () => {
   const prev = snap(1_000_000, 100, 2000);
   const cur = snap(1_060_000, 100, 2060);
+  const events = detectEvents(prev, cur, cfg);
+  assert(!events.some((e) => e.type === 'RESET_TIME_CHANGED'));
+});
+
+test('treat UI-rounded near-100 usage as exhausted', () => {
+  const w = snap(1_000_000, 99.6, 2000).windows['codex:primary'];
+  assert.equal(isEffectivelyExhausted(w), true);
+});
+
+test('do not treat 99.4 percent as exhausted without server limit state', () => {
+  const w = snap(1_000_000, 99.4, 2000).windows['codex:primary'];
+  assert.equal(isEffectivelyExhausted(w), false);
+});
+
+test('server limit state counts as exhausted even below near-100 threshold', () => {
+  const w = snap(1_000_000, 98, 2000, { rateLimitReachedType: 'hard_limit' }).windows['codex:primary'];
+  assert.equal(isEffectivelyExhausted(w), true);
+});
+
+test('suppress reset time movement at 99.6 percent', () => {
+  const prev = snap(1_000_000, 99.6, 2000);
+  const cur = snap(1_060_000, 99.6, 2060);
   const events = detectEvents(prev, cur, cfg);
   assert(!events.some((e) => e.type === 'RESET_TIME_CHANGED'));
 });
