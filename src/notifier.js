@@ -3,6 +3,7 @@
 const { spawn } = require('node:child_process');
 const path = require('node:path');
 const { formatEvent } = require('./format');
+const { isEffectivelyExhausted } = require('./detector');
 
 class Notifier {
   constructor(config, logger) {
@@ -23,6 +24,18 @@ class Notifier {
 
   async sendEvent(evt, snapshot) {
     if (!this.shouldNotify(evt)) return;
+    if (evt.type === 'RESET_TIME_CHANGED') {
+      const currentWindow = evt.windowKey ? snapshot.windows?.[evt.windowKey] : null;
+      if (isEffectivelyExhausted(currentWindow)) {
+        this.logger.info('Suppressed RESET_TIME_CHANGED notification for exhausted usage window', {
+          windowKey: evt.windowKey || null,
+          usedPercent: currentWindow?.usedPercent ?? null,
+          remainingPercent: currentWindow?.remainingPercent ?? null,
+          rateLimitReachedType: currentWindow?.rateLimitReachedType ?? null
+        });
+        return;
+      }
+    }
     const msg = formatEvent(evt, snapshot);
     this.logger.info(`Notification: ${msg.title}`, { type: evt.type, body: msg.body });
     await this.send(msg.title, msg.body, evt.severity || 'INFO');
