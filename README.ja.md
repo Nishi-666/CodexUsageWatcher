@@ -1,4 +1,4 @@
-# Codex Usage Watcher 1.1.2
+# Codex Usage Watcher 1.1.3
 
 Windows上でCodexのChatGPT利用制限を監視し、利用量のリセット、リセット時刻変更、残量低下、上限到達、復旧などを通知する**非公式のローカル常駐ツール**です。
 
@@ -73,7 +73,7 @@ Codex CLIの初回認証がまだの場合は、`codex` を一度起動して利
 | --- | --- |
 | `start.bat` | 監視開始 |
 | `stop.bat` | 監視停止 |
-| `status.bat` | 最後に保存した利用状況を表示 |
+| `status.bat` | バージョン・実行フォルダ・最後に保存した利用状況を表示 |
 | `check-now.bat` | app-serverへ直接接続して現在値を取得 |
 | `test-notification.bat` | Windows通知と任意のメール通知をテスト |
 | `run-tests.bat` | 自動テストを実行 |
@@ -100,7 +100,7 @@ GitHubで追跡するのは `config.example.json` です。
 
 - `NORMAL_RESET` — 以前の `resetsAt` 付近で使用量が回復。
 - `EARLY_RESET` — 予定時刻から離れた時点で使用量が回復。
-- `RESET_TIME_CHANGED` — 利用量リセットを伴わず `resetsAt` が有意に変化。利用率100%（残量0%）中は、上限状態更新に伴う連続通知を防ぐため抑止します。
+- `RESET_TIME_CHANGED` — 利用量リセットを伴わず `resetsAt` が有意に変化。v1.1.3では、使用率99.5%以上、残量0.5%以下、またはCodex側が上限到達状態を返している間は、上限状態更新に伴う連続通知を防ぐため抑止します。
 - `LOW_REMAINING` — 残量が指定閾値を下回った。
 - `LIMIT_REACHED` — 残量0%到達。
 - `SERVER_LIMIT_REACHED` — Codex側が上限到達状態を返した。

@@ -1,5 +1,16 @@
 'use strict';
 
+const EXHAUSTED_USED_PERCENT = 99.5;
+const EXHAUSTED_REMAINING_PERCENT = 0.5;
+
+function isEffectivelyExhausted(window) {
+  if (!window) return false;
+  if (window.rateLimitReachedType) return true;
+  if (typeof window.usedPercent === 'number' && Number.isFinite(window.usedPercent) && window.usedPercent >= EXHAUSTED_USED_PERCENT) return true;
+  if (typeof window.remainingPercent === 'number' && Number.isFinite(window.remainingPercent) && window.remainingPercent <= EXHAUSTED_REMAINING_PERCENT) return true;
+  return false;
+}
+
 function detectEvents(previous, current, cfg) {
   const events = [];
   if (!previous) return events;
@@ -27,7 +38,7 @@ function detectEvents(previous, current, cfg) {
     const resetTimeMovedForward = resetTimeDiff !== null && resetTimeDiff >= cfg.resetTimeChangeMinSeconds;
     const enoughDrop = usedDrop >= cfg.resetDropMinPoints;
     const smallDropWithNewWindow = usedDrop > 0 && resetTimeMovedForward;
-    const currentLimitReached = cur.usedPercent >= 100;
+    const currentLimitReached = isEffectivelyExhausted(cur);
 
     let resetDetected = false;
     if (enoughDrop || smallDropWithNewWindow) {
@@ -55,10 +66,10 @@ function detectEvents(previous, current, cfg) {
       ));
     }
 
-    // While the usage window is exhausted, Codex may move resetsAt as the
-    // server refreshes its limit state. Treating each movement as a real
-    // schedule change causes one notification per poll. The actual recovery
-    // is still detected above when usedPercent drops from 100%.
+    // Codex can refresh an exhausted limit with a moving resetsAt value.
+    // UI surfaces may round a near-100 value (for example 99.6) to 100%, so
+    // use the same practical notion of exhaustion instead of requiring an
+    // exact floating-point 100. Real recovery is still detected above.
     if (!resetDetected && !currentLimitReached && resetTimeDiff !== null && Math.abs(resetTimeDiff) >= cfg.resetTimeChangeMinSeconds) {
       events.push(event('RESET_TIME_CHANGED', 'NOTICE', cur, {
         previousResetsAt: prev.resetsAt,
@@ -112,4 +123,4 @@ function dedupe(events) {
   });
 }
 
-module.exports = { detectEvents };
+module.exports = { detectEvents, isEffectivelyExhausted, EXHAUSTED_USED_PERCENT, EXHAUSTED_REMAINING_PERCENT };

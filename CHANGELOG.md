@@ -2,6 +2,21 @@
 
 All notable public changes to Codex Usage Watcher will be documented here.
 
+## [1.1.3] - 2026-08-27
+
+### Fixed
+
+- Treat near-100% usage (>=99.5%), <=0.5% remaining, or a server-reported limit state as effectively exhausted when deciding whether to emit `RESET_TIME_CHANGED`.
+- Add a second defensive suppression check in the notifier, so an exhausted window cannot produce the Windows PowerShell reset-time notification even if such an event reaches the notification layer.
+
+### Diagnostics
+
+- `status.bat` now shows the watcher package version and the install folder it is reading, making stale or duplicate installations easier to identify.
+
+### Tests
+
+- Added regression coverage for near-100 floating-point usage values, explicit server limit state, and the boundary below the effective-exhaustion threshold.
+
 ## [1.1.2] - 2026-08-26
 
 ### Fixed

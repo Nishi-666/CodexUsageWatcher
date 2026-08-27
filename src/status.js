@@ -1,5 +1,6 @@
 'use strict';
 const path = require('node:path');
+const { version } = require('../package.json');
 const { loadConfig } = require('./config');
 const { loadState } = require('./storage');
 const { fmtTime, displayLimitName } = require('./format');
@@ -11,7 +12,8 @@ const lock = readLock(lockPath);
 const owner = lock ? inspectLockOwner(lock) : { running: false, verified: true, reason: 'no lock file' };
 let status;
 if (!owner.running) status = 'STOPPED'; else if (owner.verified) status = `RUNNING (PID ${lock.pid})`; else status = `UNKNOWN (PID ${lock.pid}; ${owner.reason})`;
-console.log(`Codex Usage Watcher: ${status}`);
+console.log(`Codex Usage Watcher v${version}: ${status}`);
+console.log(`実行フォルダ: ${config._root}`);
 if (!state) { console.log('まだ利用量スナップショットがありません。'); process.exit(0); }
 console.log(`最終取得: ${new Date(state.capturedAt).toLocaleString('ja-JP')}`); console.log('');
 for (const w of Object.values(state.windows || {})) {
